@@ -233,7 +233,7 @@ run, and no human has opened this on a device.**
   anywhere unless the user states their own effective hourly rate. No market
   average or benchmark is ever substituted; the page ships hours-only and says
   so.
-- Added the **deterministic spine** (Rico ruling 2026-08-11): the verdict is a
+- Added the **deterministic spine** (design decision, 2026-08-11): the verdict is a
   lookup table over `whose judgment x what breaks if wrong`, the refusal
   trigger is a four-field completeness check, and the arithmetic is fully
   specified (half-credit on hand-downs, 4.33 weeks a month) and printed on the
