@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="delegation-audit-tier" content="T1">
+<meta name="delegation-audit-rate" content="set">
+<title>Delegation Audit -- Mercer &amp; Co</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%237A1F2B'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:        #FBFAF7;
+    --surface:   #FFFFFF;
+    --surface-2: #F3F1EC;
+    --border:    #DED9CF;
+    --text:      #1C1D21;
+    --muted:     #5A5D66;
+    --dim:       #8A8D96;
+    --accent:    #7A1F2B;
+    --accent-2:  #B8893B;
+    --good:      #2E7D5B;
+    --hold:      #B8893B;
+    --radius:    10px;
+    --sans: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); line-height: 1.6; font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 44px 24px 80px; }
+
+  header { border-bottom: 3px solid var(--accent); padding-bottom: 18px; margin-bottom: 8px; }
+  .brandbar { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .brandbar img { height: 38px; width: auto; }
+  .brandbar .who { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  header h1 { font-size: clamp(1.7rem, 3.6vw, 2.3rem); line-height: 1.12; margin: 0 0 6px; letter-spacing: -0.02em; }
+  .subtitle { color: var(--muted); margin: 0; font-size: 1.02rem; }
+  .meta { font-family: var(--mono); font-size: 0.76rem; color: var(--dim); margin-top: 12px; }
+
+  .headline { display: flex; flex-wrap: wrap; gap: 14px; margin: 30px 0 10px; }
+  .stat { flex: 1 1 200px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius); padding: 16px 18px; }
+  .stat .n { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; display: block; line-height: 1.1; }
+  .stat .l { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+  .stat .sub { font-size: 0.82rem; color: var(--dim); margin-top: 6px; }
+
+  section { margin-top: 38px; }
+  h2 { font-size: 1.3rem; margin: 0 0 12px; padding-bottom: 7px; border-bottom: 1px solid var(--border); letter-spacing: -0.01em; }
+  h3 { font-size: 1.02rem; margin: 22px 0 8px; }
+  p { color: var(--text); }
+  a { color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  td.num { font-family: var(--mono); white-space: nowrap; }
+
+  .verdict { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 999px; display: inline-block; white-space: nowrap; }
+  .v-ai     { background: rgba(46,125,91,0.10);  color: var(--good);   border: 1px solid rgba(46,125,91,0.35); }
+  .v-draft  { background: rgba(184,137,59,0.12); color: var(--hold);   border: 1px solid rgba(184,137,59,0.40); }
+  .v-down   { background: rgba(122,31,43,0.08);  color: var(--accent); border: 1px solid rgba(122,31,43,0.30); }
+  .v-yours  { background: var(--surface-2);      color: var(--muted);  border: 1px solid var(--border); }
+
+  .callout { border-radius: var(--radius); padding: 14px 18px; margin: 16px 0; border: 1px solid var(--border); background: var(--surface-2); }
+  .callout .lbl { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); display: block; margin-bottom: 4px; }
+  .callout.open { border-color: rgba(184,137,59,0.45); background: rgba(184,137,59,0.07); }
+  .callout.open .lbl { color: var(--hold); }
+
+  .working { font-size: 0.84rem; color: var(--muted); font-family: var(--mono); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; white-space: pre-wrap; }
+
+  footer { margin-top: 46px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--dim); }
+
+  @media print {
+    body { background: #fff; font-size: 11.5pt; }
+    main { max-width: none; padding: 0; }
+    section { page-break-inside: avoid; margin-top: 22px; }
+    .stat { break-inside: avoid; }
+    a { color: var(--text); text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <div class="brandbar">
+      <svg height="38" viewBox="0 0 150 38" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mercer and Co">
+        <rect width="38" height="38" rx="7" fill="#7A1F2B"></rect>
+        <text x="19" y="26" font-family="Helvetica,Arial" font-size="17" font-weight="700" fill="#ffffff" text-anchor="middle">M</text>
+        <text x="48" y="25" font-family="Helvetica,Arial" font-size="15" font-weight="600" fill="#1C1D21">Mercer &amp; Co</text>
+      </svg>
+      <span class="who">Mercer &amp; Co</span>
+    </div>
+    <h1>Delegation Audit</h1>
+    <p class="subtitle">Priya's week, graded -- what AI can carry, what moves down, and what only you can do.</p>
+    <p class="meta">
+      Prepared 2026-08-10 &middot;
+      9 tasks graded, 3 still open &middot;
+      week of August 3, 2026 &middot;
+      <span data-execution-tier="T1">Execution tier: T1</span>
+    </p>
+  </header>
+
+  <div class="headline" data-reclaimed-hours="11.0" data-ai-hours="9.5" data-person-hours="1.5">
+    <div class="stat">
+      <span class="l">Hours back, per week</span>
+      <span class="n">11.0</span>
+      <div class="sub">out of the 20.5 hours we put a name to, in Priya's 55-hour week</div>
+    </div>
+    <div class="stat">
+      <span class="l">Of that, software carries</span>
+      <span class="n">9.5</span>
+      <div class="sub">1.5 of it moves to a person instead</div>
+    </div>
+    <div class="stat">
+      <span class="l">Hours back, per month</span>
+      <span class="n">47.6</span>
+      <div class="sub">at 4.33 weeks a month</div>
+    </div>
+    <div class="stat">
+      <span class="l">That's worth, monthly</span>
+      <span class="n">$2,523</span>
+      <div class="sub">at your stated rate of $53/hour</div>
+    </div>
+  </div>
+
+  <section id="summary">
+    <h2>What this says</h2>
+    <p>Eleven of the twenty and a half hours we walked through go to work that
+      never needed your judgment -- assembling proposal documents, fixing
+      decks, running invoices. At your own effective rate that is about $2,523
+      a month of your time spent on assembly. The hours go back to the three
+      things nobody else at Mercer can do: the strategy inside a pitch, the
+      review that keeps the work good, and the client relationships.</p>
+    <p><strong>Read the open list before you trust the headline.</strong>
+      Three things you named could not be priced, and "bunch of admin" is
+      almost certainly hours that belong in the eleven. The real number is
+      higher than this page says -- but this is the number you can defend.</p>
+    <div class="callout">
+      <span class="lbl">The one line</span>
+      At least eleven hours a week of your time goes to assembly work a
+      draft-and-approve loop can carry -- roughly $2,523 a month -- and three
+      more pieces of your week are not yet described well enough to price.
+    </div>
+  </section>
+
+  <section id="buckets">
+    <h2>Where the work goes</h2>
+    <p>Nothing here removes a person from Mercer &amp; Co. Every line moves a
+      <em>task</em>: down to whoever owns that outcome, with AI carrying the
+      mechanical part -- and a short summary coming back to you for approval.
+      You keep every decision. You stop doing the assembly.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>What you do</th>
+          <th>Hrs/wk</th>
+          <th>Where it goes</th>
+          <th>What comes back to you</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Writing proposals</td>
+          <td class="num">4.0</td>
+          <td><span class="verdict v-draft">AI drafts, you approve</span></td>
+          <td>The proposal assembled from your strategy notes and past wins. You write the thinking, approve the rest.</td>
+        </tr>
+        <tr>
+          <td>Reviewing the team's work</td>
+          <td class="num">3.5</td>
+          <td><span class="verdict v-yours">Stays yours</span></td>
+          <td>Stays yours -- this is what keeps the work good.</td>
+        </tr>
+        <tr>
+          <td>Client calls</td>
+          <td class="num">3.0</td>
+          <td><span class="verdict v-yours">Stays yours</span></td>
+          <td>Stays yours -- the relationships are the business.</td>
+        </tr>
+        <tr>
+          <td>Monthly numbers</td>
+          <td class="num">2.0</td>
+          <td><span class="verdict v-down">Hand down, AI assists</span></td>
+          <td>The bookkeeper owns it; AI assembles the month. You get the summary and the one number that matters.</td>
+        </tr>
+        <tr>
+          <td>Fixing the Thursday deck</td>
+          <td class="num">2.0</td>
+          <td><span class="verdict v-ai">AI carries it</span></td>
+          <td>Formatting and consistency done. You skim the finished deck.</td>
+        </tr>
+        <tr>
+          <td>Writing the case study</td>
+          <td class="num">2.0</td>
+          <td><span class="verdict v-ai">AI carries it</span></td>
+          <td>A draft from the project files. You skim it.</td>
+        </tr>
+        <tr>
+          <td>Invoicing</td>
+          <td class="num">1.5</td>
+          <td><span class="verdict v-draft">AI drafts, you approve</span></td>
+          <td>Invoices drafted from the month's work. You approve the batch.</td>
+        </tr>
+        <tr>
+          <td>Hiring -- designer search</td>
+          <td class="num">1.5</td>
+          <td><span class="verdict v-yours">Stays yours</span></td>
+          <td>Stays yours -- a wrong hire at six people is expensive for a year.</td>
+        </tr>
+        <tr>
+          <td>Freelancer scheduling</td>
+          <td class="num">1.0</td>
+          <td><span class="verdict v-down">Hand down, AI assists</span></td>
+          <td>The account lead owns it; AI tracks who is booked and what is due. Anything at risk comes up to you same-day.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="handdowns">
+    <h2>What moves down, and to whom</h2>
+    <p>Each of these already needs <em>a</em> judgment -- just not yours. It
+      moves to the person who owns that outcome, and they get an assist that
+      makes it a bigger job than it was, not a smaller one.</p>
+
+    <h3>Monthly numbers &rarr; the bookkeeper</h3>
+    <p>She already owns the outcome; you were doing the assembly. AI pulls the
+      month together in the shape she wants, she runs it, and you read one
+      summary instead of building the spreadsheet.</p>
+
+    <h3>Freelancer scheduling &rarr; the account lead</h3>
+    <p>This is the one worth a conversation. Right now you are the routing
+      table for every freelancer, which means the account lead owns the
+      client's deadline without owning the resource that meets it. Giving her
+      the schedule -- with AI tracking who is booked, what is due, and what has
+      slipped -- makes her job whole. You see anything at risk the same day.</p>
+  </section>
+
+  <section id="yours">
+    <h2>What stays yours</h2>
+    <p>These need your relationships, your taste, or your read on a person.
+      This is what the eleven hours are for -- more time inside the pitches
+      and the review, which is what clients are actually buying.</p>
+    <ul>
+      <li><strong>Reviewing the team's work</strong> -- your standard is the product; nobody else can apply it yet.</li>
+      <li><strong>Client calls</strong> -- these are relationships, not transactions.</li>
+      <li><strong>The strategy inside a proposal</strong> -- AI assembles the document, but the thinking is why you win.</li>
+      <li><strong>Hiring</strong> -- at six people, one wrong hire is a year of drag.</li>
+    </ul>
+  </section>
+
+  <section id="open">
+    <h2>Still too vague to price</h2>
+    <p>These came up but could not be graded -- each one is really two or
+      three different jobs wearing one name. Nothing was estimated for them
+      and nothing above counts them. Answer these three and the audit gets
+      sharper, and probably bigger.</p>
+
+    <div class="callout open">
+      <span class="lbl">Needs one answer</span>
+      <strong>"New business stuff"</strong><br>
+      Which part eats the most of your week -- writing proposals, taking intro
+      calls, or chasing people who went quiet? (Proposals came out of this one
+      already and are graded above at 4.0 hours. The other two are still
+      unpriced.)
+    </div>
+
+    <div class="callout open">
+      <span class="lbl">Needs one answer</span>
+      <strong>"Bunch of admin"</strong><br>
+      What were the three things you actually did the last three times this
+      happened? This is where hours hide, and it is very likely the biggest
+      unpriced item on the page.
+    </div>
+
+    <div class="callout open">
+      <span class="lbl">Left off on purpose</span>
+      <strong>"Handled the Brennan situation"</strong><br>
+      A one-off, not a weekly cost -- averaging it into a weekly number would
+      inflate everything else here. If relationship rescues start being a
+      pattern rather than an incident, that is worth its own conversation.
+    </div>
+  </section>
+
+  <section id="working">
+    <h2>How these numbers were figured</h2>
+    <div class="working">AI carries it          = 2.0 (case study) + 2.0 (deck)       = 4.0
+AI drafts, you approve = 4.0 (proposals) + 1.5 (invoicing)     = 5.5
+Hand down, AI assists  = 2.0 (numbers) + 1.0 (freelancers)     = 3.0
+Stays yours            = 3.5 + 3.0 + 1.5                       = 8.0
+
+reclaimed hours per week  = 4.0 + 5.5 + (3.0 / 2)  = 11.0
+  of that, software carries                         =  9.5
+  of that, a person carries                         =  1.5
+reclaimed hours per month = 11.0 x 4.33            = 47.6
+monthly value             = 47.6 x $53             = $2,523
+total hours reviewed                               = 20.5
+
+not counted anywhere: "new business stuff", "bunch of admin",
+                      "the Brennan situation"</div>
+    <p style="font-size:0.86rem;color:var(--muted);margin-top:10px;">
+      Every hour above came from Priya's own answers -- nothing was estimated,
+      and the three open items are counted in nothing at all. Hand-down tasks
+      count at half, because handing work over and reading the summary still
+      takes real time. A month is counted as 4.33 weeks. The $53 rate is
+      Priya's own figure: $140,000 of owner pay divided by 55 hours a week
+      across 48 weeks.
+    </p>
+  </section>
+
+  <section id="next">
+    <h2>Where to start</h2>
+    <ol>
+      <li><strong>This week: track the admin.</strong> Every time you catch
+        yourself doing "admin," write the actual task down. Three entries is
+        enough to grade it, and it is probably the biggest number on this
+        page.</li>
+      <li><strong>The proposal document.</strong> Four hours a week, and the
+        strategy stays yours -- feed the last three winning proposals in as
+        the pattern.</li>
+      <li><strong>Give the account lead the freelancer schedule.</strong> The
+        conversation is the work; the tracking is the easy part.</li>
+      <li><strong>Then the deck fixes and invoicing.</strong> Small hours, but
+        they are the ones that eat a Thursday.</li>
+    </ol>
+    <p style="font-size:0.9rem;color:var(--muted);">Run this audit again in a
+      quarter against the same list -- the second one shows what actually
+      moved, and what crept back.</p>
+  </section>
+
+  <footer>
+    Mercer &amp; Co delegation audit, August 2026.
+    <br><em>Illustrative example. Names, numbers, and the business are invented.</em>
+  </footer>
+
+</main>
+</body>
+</html>

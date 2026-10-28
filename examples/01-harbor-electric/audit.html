@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="delegation-audit-tier" content="T1">
+<meta name="delegation-audit-rate" content="set">
+<title>Delegation Audit -- Harbor Electric</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%237A1F2B'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'%3EHE%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:        #FBFAF7;
+    --surface:   #FFFFFF;
+    --surface-2: #F3F1EC;
+    --border:    #DED9CF;
+    --text:      #1C1D21;
+    --muted:     #5A5D66;
+    --dim:       #8A8D96;
+    --accent:    #7A1F2B;
+    --accent-2:  #B8893B;
+    --good:      #2E7D5B;
+    --hold:      #B8893B;
+    --radius:    10px;
+    --sans: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); line-height: 1.6; font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 44px 24px 80px; }
+
+  header { border-bottom: 3px solid var(--accent); padding-bottom: 18px; margin-bottom: 8px; }
+  .brandbar { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .brandbar img { height: 38px; width: auto; }
+  .brandbar .who { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  header h1 { font-size: clamp(1.7rem, 3.6vw, 2.3rem); line-height: 1.12; margin: 0 0 6px; letter-spacing: -0.02em; }
+  .subtitle { color: var(--muted); margin: 0; font-size: 1.02rem; }
+  .meta { font-family: var(--mono); font-size: 0.76rem; color: var(--dim); margin-top: 12px; }
+
+  .headline { display: flex; flex-wrap: wrap; gap: 14px; margin: 30px 0 10px; }
+  .stat { flex: 1 1 200px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius); padding: 16px 18px; }
+  .stat .n { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; display: block; line-height: 1.1; }
+  .stat .l { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+  .stat .sub { font-size: 0.82rem; color: var(--dim); margin-top: 6px; }
+
+  section { margin-top: 38px; }
+  h2 { font-size: 1.3rem; margin: 0 0 12px; padding-bottom: 7px; border-bottom: 1px solid var(--border); letter-spacing: -0.01em; }
+  h3 { font-size: 1.02rem; margin: 22px 0 8px; }
+  p { color: var(--text); }
+  a { color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  td.num { font-family: var(--mono); white-space: nowrap; }
+
+  .verdict { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 999px; display: inline-block; white-space: nowrap; }
+  .v-ai     { background: rgba(46,125,91,0.10);  color: var(--good);   border: 1px solid rgba(46,125,91,0.35); }
+  .v-draft  { background: rgba(184,137,59,0.12); color: var(--hold);   border: 1px solid rgba(184,137,59,0.40); }
+  .v-down   { background: rgba(122,31,43,0.08);  color: var(--accent); border: 1px solid rgba(122,31,43,0.30); }
+  .v-downp  { background: rgba(122,31,43,0.04);  color: var(--accent); border: 1px dashed rgba(122,31,43,0.45); }
+  .v-yours  { background: var(--surface-2);      color: var(--muted);  border: 1px solid var(--border); }
+
+  .callout { border-radius: var(--radius); padding: 14px 18px; margin: 16px 0; border: 1px solid var(--border); background: var(--surface-2); }
+  .callout .lbl { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); display: block; margin-bottom: 4px; }
+  .callout.open { border-color: rgba(184,137,59,0.45); background: rgba(184,137,59,0.07); }
+  .callout.open .lbl { color: var(--hold); }
+
+  .working { font-size: 0.84rem; color: var(--muted); font-family: var(--mono); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; white-space: pre-wrap; }
+
+  footer { margin-top: 46px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--dim); }
+
+  @media print {
+    body { background: #fff; font-size: 11.5pt; }
+    main { max-width: none; padding: 0; }
+    section { page-break-inside: avoid; margin-top: 22px; }
+    .stat { break-inside: avoid; }
+    a { color: var(--text); text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <div class="brandbar">
+      <svg height="38" viewBox="0 0 150 38" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Keel Partners">
+        <rect width="38" height="38" rx="7" fill="#7A1F2B"></rect>
+        <text x="19" y="26" font-family="Helvetica,Arial" font-size="17" font-weight="700" fill="#ffffff" text-anchor="middle">KP</text>
+        <text x="48" y="25" font-family="Helvetica,Arial" font-size="15" font-weight="600" fill="#1C1D21">Keel Partners</text>
+      </svg>
+      <span class="who">Prepared by Keel Partners coaching</span>
+    </div>
+    <h1>Delegation Audit</h1>
+    <p class="subtitle">Dave's week, graded -- what AI can carry, what moves down, and what only you can do.</p>
+    <p class="meta">
+      Prepared 2026-08-10 &middot;
+      16 tasks reviewed &middot;
+      week of August 3, 2026 &middot;
+      <span data-execution-tier="T1">Execution tier: T1</span>
+    </p>
+  </header>
+
+  <div class="headline" data-reclaimed-hours="16.0" data-ai-hours="13.5" data-person-hours="2.5">
+    <div class="stat">
+      <span class="l">Hours back, per week</span>
+      <span class="n">16.0</span>
+      <div class="sub">out of the 26.0 hours we put a name to, in a 63-hour week</div>
+    </div>
+    <div class="stat">
+      <span class="l">Of that, software carries</span>
+      <span class="n">13.5</span>
+      <div class="sub">2.5 of it moves to a person instead</div>
+    </div>
+    <div class="stat">
+      <span class="l">Hours back, per month</span>
+      <span class="n">69.3</span>
+      <div class="sub">at 4.33 weeks a month</div>
+    </div>
+    <div class="stat">
+      <span class="l">That's worth, monthly</span>
+      <span class="n">$4,227</span>
+      <div class="sub">at your stated rate of $61/hour</div>
+    </div>
+  </div>
+
+  <section id="summary">
+    <h2>What this says</h2>
+    <p>Of the twenty-six hours we put a name to -- out of the sixty-three you
+      said you work -- sixteen are going to work that never needed your
+      judgment: writing the same six paragraphs onto a different number,
+      laying out a schedule grid on a Sunday night, and the texting wrapped
+      around "are you coming Tuesday" calls. At your own effective rate, that
+      is roughly $4,227 a month of your time. Thirteen and a half of those
+      hours software genuinely carries; the other two and a half move to
+      Angela. The hours come back to the two things nobody else at Harbor can
+      do: standing on a job deciding how it gets built, and pricing the work.</p>
+    <div class="callout">
+      <span class="lbl">The one line</span>
+      About sixteen hours a week of your time goes to work you should not be
+      holding -- roughly $4,227 a month of your own time, most of it spent on
+      paperwork wrapped around the real job.
+    </div>
+  </section>
+
+  <section id="buckets">
+    <h2>Where the work goes</h2>
+    <p>Nothing here removes a person from Harbor Electric. Every line moves a
+      <em>task</em>: down to whoever owns that outcome, with AI carrying the
+      mechanical part where there is one -- and a short summary coming back to
+      you for approval. You keep every decision. You stop doing the typing.</p>
+    <p>Two lines below say <strong>no AI</strong>, and they mean it. Phone
+      calls and site walks are not software work, and this page will not tell
+      you otherwise. Those still move to Angela -- what changes is whose job
+      they are, not whether a person does them.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>What you do</th>
+          <th>Hrs/wk</th>
+          <th>Where it goes</th>
+          <th>What comes back to you</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Writing up quotes (the document itself)</td>
+          <td class="num">5.0</td>
+          <td><span class="verdict v-draft">AI drafts, you approve</span></td>
+          <td>A finished quote with the price left blank. You fill the number and send.</td>
+        </tr>
+        <tr>
+          <td>Routine scheduling calls, on the phone ("are you coming Tuesday")</td>
+          <td class="num">3.0</td>
+          <td><span class="verdict v-downp">Hand down, no AI</span></td>
+          <td>Angela makes these calls -- no software does. What you get is a Friday summary of what moved.</td>
+        </tr>
+        <tr>
+          <td>Confirmation and running-late texts</td>
+          <td class="num">1.5</td>
+          <td><span class="verdict v-ai">AI carries it</span></td>
+          <td>Sent off the schedule. You skim a Friday summary.</td>
+        </tr>
+        <tr>
+          <td>Weekly scheduling, Sunday night</td>
+          <td class="num">2.5</td>
+          <td><span class="verdict v-draft">AI drafts, you approve</span></td>
+          <td>The grid already laid out. You move the names and approve it -- about thirty minutes.</td>
+        </tr>
+        <tr>
+          <td>Site visit -- Hendricks meter location</td>
+          <td class="num">2.0</td>
+          <td><span class="verdict v-yours">Stays yours</span></td>
+          <td>Stays yours -- this is what you were hired for.</td>
+        </tr>
+        <tr>
+          <td>Site visit -- church walkthrough</td>
+          <td class="num">2.0</td>
+          <td><span class="verdict v-yours">Stays yours</span></td>
+          <td>Stays yours -- this is what you were hired for.</td>
+        </tr>
+        <tr>
+          <td>Chasing the supply house, on the phone</td>
+          <td class="num">1.0</td>
+          <td><span class="verdict v-downp">Hand down, no AI</span></td>
+          <td>Angela owns the calls. This one is just work, and it is hers now.</td>
+        </tr>
+        <tr>
+          <td>Order-status list and customer updates</td>
+          <td class="num">0.5</td>
+          <td><span class="verdict v-draft">AI drafts, you approve</span></td>
+          <td>What has slipped, flagged, with the customer note drafted. You approve before it goes.</td>
+        </tr>
+        <tr>
+          <td>Invoicing on Friday</td>
+          <td class="num">1.5</td>
+          <td><span class="verdict v-draft">AI drafts, you approve</span></td>
+          <td>Friday invoices drafted from the week's jobs. You approve the batch.</td>
+        </tr>
+        <tr>
+          <td>New-customer and pricing calls</td>
+          <td class="num">1.5</td>
+          <td><span class="verdict v-yours">Stays yours</span></td>
+          <td>Stays yours -- these are the calls that become jobs.</td>
+        </tr>
+        <tr>
+          <td>Saturday email triage</td>
+          <td class="num">1.5</td>
+          <td><span class="verdict v-ai">AI carries it</span></td>
+          <td>A Monday-morning digest: what came in, what needs you, what was handled.</td>
+        </tr>
+        <tr>
+          <td>Payroll</td>
+          <td class="num">1.0</td>
+          <td><span class="verdict v-down">Hand down, AI assists</span></td>
+          <td>The bookkeeper runs it; AI assembles the hours. You approve the total.</td>
+        </tr>
+        <tr>
+          <td>Pricing the quote (the number)</td>
+          <td class="num">1.0</td>
+          <td><span class="verdict v-yours">Stays yours</span></td>
+          <td>Stays yours -- the margin call is the business.</td>
+        </tr>
+        <tr>
+          <td>Weekly safety meeting</td>
+          <td class="num">1.0</td>
+          <td><span class="verdict v-yours">Stays yours</span></td>
+          <td>Stays yours -- your crew needs to hear it from you.</td>
+        </tr>
+        <tr>
+          <td>Certificate of insurance requests</td>
+          <td class="num">0.5</td>
+          <td><span class="verdict v-draft">AI drafts, you approve</span></td>
+          <td>The certificate request drafted and ready. You glance and send.</td>
+        </tr>
+        <tr>
+          <td>Writing the apprentice job ad</td>
+          <td class="num">0.5</td>
+          <td><span class="verdict v-ai">AI carries it</span></td>
+          <td>Drafted and posted where you say. You skim it first.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="handdowns">
+    <h2>What moves down, and to whom</h2>
+    <p>Each of these already needs <em>a</em> judgment -- just not yours. It
+      moves to the person who owns that outcome, and they get an assist that
+      makes it a bigger job than it was, not a smaller one.</p>
+
+    <h3>Routine scheduling calls &rarr; Angela <em>(no AI &mdash; this one is just work)</em></h3>
+    <p>Right now nobody formally owns the schedule -- Angela does it when she
+      is in the office, which is why it lands back on you the rest of the
+      time. <strong>Naming her the owner is the whole change here.</strong>
+      Somebody still picks up the phone and says "yes, Tuesday" -- no software
+      makes that call, and this page is not going to pretend otherwise. What
+      moves is whose job it is. You get a Friday summary of anything that
+      shifted. Angela goes from catching phones to owning the customer's week
+      -- that is a promotion, and it is worth saying to her that way.</p>
+
+    <h3>Confirmation and running-late texts &rarr; carried by AI</h3>
+    <p>This is the part of those calls that <em>is</em> software work, and it
+      was an hour and a half of your week. Confirmations go out off the
+      schedule; a running-late note goes out when the crew slips. You see the
+      week's worth in the Friday summary and never type one again.</p>
+
+    <h3>Chasing the supply house &rarr; Angela <em>(no AI on the calls)</em></h3>
+    <p>Same owner. The calls are Angela's -- she decides who to lean on and how
+      hard, and there is no software substitute for a person the counter guy
+      knows. What AI takes is the list underneath it: what has slipped past its
+      promised date, and the customer note that has to go out because of it,
+      drafted for your approval. Anything that threatens a scheduled job comes
+      up to you the same day.</p>
+
+    <h3>Payroll &rarr; the bookkeeper</h3>
+    <p>She already owns the outcome; you were doing the assembly. AI pulls the
+      hours together into the format she wants, she runs it, and you approve
+      the total instead of building it.</p>
+  </section>
+
+  <section id="yours">
+    <h2>What stays yours</h2>
+    <p>These need your relationships, your authority, or twenty years of
+      knowing how a job goes sideways. This is the list the sixteen hours are
+      for -- more site time, more pricing, more of the calls that turn into
+      work.</p>
+    <ul>
+      <li><strong>Pricing the quote</strong> -- the margin call is the business, and it is a judgment nobody else at Harbor has the exposure to make.</li>
+      <li><strong>Site visits and walkthroughs</strong> -- Hendricks and the church both needed somebody standing there deciding how it gets built.</li>
+      <li><strong>New-customer calls</strong> -- these are the calls that become jobs. They should get more of you, not less.</li>
+      <li><strong>The safety meeting</strong> -- it lands differently coming from the owner, and everyone in the room knows it.</li>
+    </ul>
+  </section>
+
+  <section id="working">
+    <h2>How these numbers were figured</h2>
+    <div class="working">AI carries it          = 0.5 (job ad) + 1.5 (Saturday email)
+                       + 1.5 (confirmation texts)                      = 3.5
+AI drafts, you approve = 5.0 (quotes) + 2.5 (scheduling)
+                       + 0.5 (COIs) + 1.5 (invoicing)
+                       + 0.5 (order-status list)                       = 10.0
+Hand down, AI assists  = 1.0 (payroll)                                 = 1.0
+Hand down, no AI       = 3.0 (routine calls)
+                       + 1.0 (supply house calls)                      = 4.0
+Stays yours            = 1.0 + 1.5 + 2.0 + 2.0 + 1.0                   = 7.5
+
+reclaimed hours per week  = 3.5 + 10.0 + ((1.0 + 4.0) / 2)  = 16.0
+  of that, software carries                                 = 13.5
+  of that, a person carries                                 =  2.5
+reclaimed hours per month = 16.0 x 4.33                     = 69.3
+monthly value             = 69.3 x $61                      = $4,227
+total hours reviewed                                        = 26.0
+  (against the 63-hour week Dave stated)</div>
+    <p style="font-size:0.86rem;color:var(--muted);margin-top:10px;">
+      Every hour above came from Dave's own answers -- nothing was estimated.
+      Both kinds of hand-down count at half, because handing work over and
+      reading the summary still takes real time. A month is counted as 4.33
+      weeks. The $61 rate is Dave's own figure: $185,000 of owner pay divided
+      by the same 63 hours a week, across 48 weeks. The 26 hours reviewed are
+      the ones Dave could put a name to; his week is 63, and the rest of it is
+      worth a second pass someday.
+    </p>
+  </section>
+
+  <section id="next">
+    <h2>Where to start</h2>
+    <ol>
+      <li><strong>This week: the quote document.</strong> Five hours, one
+        change, and you will feel it Friday. Feed the last five quotes in as
+        the pattern, then draft the next one with the price blank.</li>
+      <li><strong>Next Sunday: the schedule grid.</strong> Let it lay out the
+        week from the job list; you move names and approve. Target thirty
+        minutes instead of two and a half hours.</li>
+      <li><strong>Tell Angela she owns the schedule.</strong> The conversation
+        is the work here; the callback draft is the easy part.</li>
+      <li><strong>Then invoicing and the certificates.</strong> Small hours,
+        but they are the ones that ruin a Friday.</li>
+    </ol>
+    <p style="font-size:0.9rem;color:var(--muted);">Run this audit again in a
+      quarter against the same list -- the second one shows what actually
+      moved, and what crept back.</p>
+  </section>
+
+  <footer>
+    Prepared by Keel Partners coaching for Harbor Electric, August 2026.
+    Questions about anything on this page go to your Keel coach.
+    <br><em>Illustrative example. Names, numbers, and the business are invented.</em>
+  </footer>
+
+</main>
+</body>
+</html>
