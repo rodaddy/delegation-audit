@@ -135,6 +135,12 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     console.error('  --install  install verification: a real refusal is required');
     process.exitCode = 3;
   } else {
-    process.exitCode = (await verifyRecordFiles(paths, { requireRefusal })) === 0 ? 0 : 1;
+    try {
+      process.exitCode = (await verifyRecordFiles(paths, { requireRefusal })) === 0 ? 0 : 1;
+    } catch (error) {
+      // An unreadable path is an invocation error (exit 3), not a content failure.
+      console.error(`ERROR ${error.message}`);
+      process.exitCode = 3;
+    }
   }
 }
