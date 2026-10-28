@@ -153,6 +153,12 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     console.error('Usage: node verify-html.mjs <audit.html> [more.html ...]');
     process.exitCode = 3;
   } else {
-    process.exitCode = (await verifyFiles(paths)) === 0 ? 0 : 1;
+    try {
+      process.exitCode = (await verifyFiles(paths)) === 0 ? 0 : 1;
+    } catch (error) {
+      // An unreadable path is an invocation error (exit 3), not a content failure.
+      console.error(`ERROR ${error.message}`);
+      process.exitCode = 3;
+    }
   }
 }
